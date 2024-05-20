@@ -182,8 +182,7 @@ curl --location 'http://localhost:8080/users' \
 }
 ```
 
-[詳細はこちら](http://localhost:8080/swagger-ui/index.html)
-
+詳細については、`http://localhost:8080/swagger-ui/index.html`を参照してください。
 
 ### Postmanの使用
 

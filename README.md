@@ -188,8 +188,7 @@ curl --location 'http://localhost:8080/users' \
     }
 }
 ```
-
-[see more detail](http://localhost:8080/swagger-ui/index.html)
+For more details, see `http://localhost:8080/swagger-ui/index.html`
 
 
 ### use postman
