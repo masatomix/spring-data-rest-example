@@ -1,12 +1,12 @@
 INSERT INTO
-    USERS (id, name)
+    USERS (id, first_name, last_name, password)
 VALUES
-    (1, 'James Smith');
+    (1, 'Smith', 'James', 'password');
 
 INSERT INTO
-    USERS (id, name)
+    USERS (id, first_name, last_name, password)
 VALUES
-    (2, 'Christopher Anderson');
+    (2, 'Anderson', 'Christopher', 'password');
 
 INSERT INTO
     POSTS(id, title, content, user_id, published)

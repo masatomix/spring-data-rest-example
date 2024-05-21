@@ -66,9 +66,36 @@ spring.data.rest.base-path=/api
 
 - **フィールド**:
   - `id`: 各ユーザーの一意の識別子。
-  - `name`: ユーザーの名前。
+  - `firstName`: ユーザーの名。
+  - `lastName`: ユーザーの姓。
 - **リレーション**:
   - `posts`: ユーザーに関連付けられた投稿のコレクションで、1対多の関係を表します。
+
+### プロジェクション
+
+プロジェクションは、APIから返されるデータのビューをカスタマイズするために使用されます。例えば、`UserProjection`はパスワードフィールドを公開せずにユーザーのフルネームを取得する方法を提供します。
+
+```java
+package com.example.demo.projection;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.rest.core.config.Projection;
+
+import com.example.demo.entity.Posts;
+import com.example.demo.entity.Users;
+
+@Projection(name = "without-password", types = { Users.class })
+public interface UserProjection {
+    @Value("#{target.firstName} #{target.lastName}")
+    public String getFullName();
+
+    public List<Posts> getPosts();
+}
+```
+
+このプロジェクションは、APIエンドポイントに`?projection=without-password`を追加することでアクセスできます。例えば、`http://localhost:8080/api/users?projection=without-password`。
 
 ### 投稿エンティティ
 

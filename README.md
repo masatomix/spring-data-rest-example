@@ -68,9 +68,38 @@ The `Users` entity encapsulates user information and establishes a relationship 
 
 - **Fields**:
   - `id`: Unique identifier for each user.
-  - `name`: The name of the user.
+  - `firstName`: The first name of the user.
+  - `lastName`: The last name of the user.
 - **Relationships**:
   - `posts`: A collection of posts associated with the user, representing a one-to-many relationship.
+
+### Projections
+
+Projections are used to customize the view of the data returned by the API. For example, the `UserProjection` provides a way to retrieve the full name of a user without exposing the password field.
+
+```java
+package com.example.demo.projection;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.rest.core.config.Projection;
+
+import com.example.demo.entity.Posts;
+import com.example.demo.entity.Users;
+
+@Projection(name = "without-password", types = { Users.class })
+public interface UserProjection {
+    @Value("#{target.firstName} #{target.lastName}")
+    public String getFullName();
+
+    public List<Posts> getPosts();
+}
+
+```
+
+This projection can be accessed by appending `?projection=without-password` to the API endpoint, e.g., `http://localhost:8080/api/users?projection=without-password`.
+
 
 ### Posts Entity
 
