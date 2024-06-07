@@ -8,6 +8,8 @@ import {
   EntityModelCompany
 } from './generated'
 import { AxiosResponse, RawAxiosRequestConfig } from 'axios';
+import { error } from 'console';
+import { DefaultDeserializer } from 'v8';
 // import { readFileSync } from 'fs';
 // import { join } from 'path';
 
@@ -28,6 +30,7 @@ export const typeDefs = gql`
   type SuccessResponse {
     success: Boolean!
     message: String
+    error: String
   }
 
   type User{
@@ -106,25 +109,18 @@ export const resolvers = {
     name: (parent: EntityModelCompany) => `${parent.companyName}`,
   },
 
-  // SuccessResponse: {
-  //   success: (status: number) => {
-  //     return status >= 200 && status < 300;
-  //   },
-  // },
-
   SuccessResponse: {
-    success: (parent: {
-      result?: AxiosResponse<EntityModelAppUser, any> | undefined;
-      error?: any;
-    }) => {
+    success: (parent: Response) => {
       return parent.result ?
         parent.result.status >= 200 && parent.result.status < 300 :
         false
     },
-    message: (parent: {
-      result?: AxiosResponse<EntityModelAppUser, any> | undefined;
-      error?: any;
-    }) => {
+    message: (parent: Response) => {
+      return parent.result ?
+        parent.result.status :
+        parent.error.message
+    },
+    error: (parent: Response) => {
       return parent.result ?
         parent.result.status :
         JSON.stringify(parent.error)
@@ -158,35 +154,30 @@ export const resolvers = {
   }
 }
 
+type Response = {
+  result?: AxiosResponse<EntityModelAppUser, any>;
+  error?: any;
+}
+
 
 // try/catch True/Falseに変換する
 const getItemResourceAppuserGet =
-  async (id: string, options?: RawAxiosRequestConfig):
-    Promise<{
-      result?: AxiosResponse<EntityModelAppUser, any>;
-      error?: any;
-    }> => {
-    try {
-      const api = new AppUserEntityControllerApi()
-      const result = (await api.getItemResourceAppuserGet(id, options));
-      return { result }
-    } catch (error) {
-      return { error }
-    }
+  (id: string, options?: RawAxiosRequestConfig): Promise<Response> => {
+    return new Promise((resolve, reject) => {
+      new AppUserEntityControllerApi()
+        .getItemResourceAppuserGet(id, options)
+        .then(result => resolve({ result }))
+        .catch(error => resolve({ error }))
+    })
   }
 
 // try/catch True/Falseに変換する
 const postCollectionResourceAppuserPost =
-  async (body: AppUserRequestBody, options?: RawAxiosRequestConfig):
-    Promise<{
-      result?: AxiosResponse<EntityModelAppUser, any>;
-      error?: any;
-    }> => {
-    try {
-      const api = new AppUserEntityControllerApi()
-      const result = (await api.postCollectionResourceAppuserPost(body, options));
-      return { result }
-    } catch (error) {
-      return { error }
-    }
+  (body: AppUserRequestBody, options?: RawAxiosRequestConfig): Promise<Response> => {
+    return new Promise((resolve, reject) => {
+      new AppUserEntityControllerApi()
+        .postCollectionResourceAppuserPost(body, options)
+        .then(result => resolve({ result }))
+        .catch(error => resolve({ error }))
+    })
   }
