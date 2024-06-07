@@ -14,11 +14,13 @@ public class AppUser {
     @Column(length = 6, nullable = false)
     private String userId;
 
-    @Column(length = 100, nullable = true)
     private String firstName;
 
-    @Column(length = 100, nullable = true)
     private String lastName;
+
+    private String email;
+
+    private int age;
 
     @ManyToOne
     @JoinColumn(name = "COMPANY_CODE", nullable = false)

@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+apollo-server-example/node_modules
+apollo-server-example/src/generated
+apollo-server-example/package-lock.json
+apollo-server-example/yarn.lock
+apollo-server-example/*.log
+apollo-server-example/api-docs.json
+apollo-server-example/openapitools.json
+apollo-server-example/dist
