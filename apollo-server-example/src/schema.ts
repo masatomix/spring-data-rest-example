@@ -3,13 +3,10 @@ import {
   AppUserEntityControllerApi,
   AppUserRequestBody,
   CompanyEntityControllerApi,
-  CompanyRequestBody,
   EntityModelAppUser,
   EntityModelCompany
 } from './generated'
 import { AxiosResponse, RawAxiosRequestConfig } from 'axios';
-import { error } from 'console';
-import { DefaultDeserializer } from 'v8';
 // import { readFileSync } from 'fs';
 // import { join } from 'path';
 
