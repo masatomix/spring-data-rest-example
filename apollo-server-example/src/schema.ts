@@ -36,7 +36,8 @@ export const typeDefs = gql`
     lastName: String
     email: String
     age: Int
-    company: String
+    companyCode:String
+    company: Company
   }
 
   type Company{
@@ -50,10 +51,9 @@ export const typeDefs = gql`
     lastName: String
     email: String
     age: Int
-    company: String
-}
+    companyCode:String
+  }
 `;
-
 
 type UserInput = {
   userId: string
@@ -61,7 +61,7 @@ type UserInput = {
   lastName?: string
   email?: string
   age?: number
-  company?: string;
+  companyCode?: string
 }
 
 export const resolvers = {
@@ -98,7 +98,14 @@ export const resolvers = {
 
   User: {
     id: (parent: EntityModelAppUser) => `${parent.userId}`,
-    company: (parent: EntityModelAppUser) => parent._links!.company.href
+    // company: (parent: EntityModelAppUser) => parent._links!.company.href
+    company: async (parent: EntityModelAppUser) => {
+      const api = new CompanyEntityControllerApi()
+      const data = (await api.getItemResourceCompanyGet(parent.companyCode!)).data
+
+      console.log(data)
+      return data
+    }
   },
 
   Company: {
@@ -138,10 +145,10 @@ export const resolvers = {
 
         const body: AppUserRequestBody = {
           userId: args.user.userId,
-          company: args.user.company ?? instance._links!.company.href!,
           firstName: args.user.firstName ?? instance.firstName!,
           lastName: args.user.lastName ?? instance.lastName!,
           age: args.user.age ?? instance.age!,
+          companyCode: args.user.companyCode ?? instance.companyCode!,
           email: args.user.email ?? instance.email!,
         }
         return await postCollectionResourceAppuserPost(body)
