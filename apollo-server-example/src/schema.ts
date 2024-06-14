@@ -53,14 +53,14 @@ export const resolvers = {
       return data._embedded?.company
     },
 
-    findUserById: async (parent: {}, args: { id: string }) => {
+    user: async (parent: {}, args: { id: string }) => {
       const p = new AppUserEntityControllerApi().getItemResourceAppuserGet(args.id)
       const data = (await p).data
       console.log(data)
       return data
     },
 
-    findCompanyById: async (parent: {}, args: { id: string }) => {
+    company: async (parent: {}, args: { id: string }) => {
       const p = new CompanyEntityControllerApi().getItemResourceCompanyGet(args.id)
       const data = (await p).data
       console.log(data)

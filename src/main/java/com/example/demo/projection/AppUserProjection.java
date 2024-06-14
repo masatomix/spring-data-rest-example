@@ -7,8 +7,8 @@ import com.example.demo.entity.AppUser;
 import com.example.demo.entity.Company;
 
 
-@Projection(name = "ExcerptAppUser", types = { AppUser.class }) 
-public interface ExcerptAppUser { 
+@Projection(name = "AppUserProjection", types = { AppUser.class }) 
+public interface AppUserProjection { 
 
     public String getUserId();
     public String getFirstName();

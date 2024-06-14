@@ -1,8 +1,8 @@
   type Query {
     users: [User]
     companies: [Company]
-    findUserById(id: ID!): User
-    findCompanyById(id: ID!): Company
+    user(id: ID!): User
+    company(id: ID!): Company
   }
 
   type Mutation {
