@@ -7,53 +7,11 @@ import {
   EntityModelCompany
 } from './generated'
 import { AxiosResponse, RawAxiosRequestConfig } from 'axios';
-// import { readFileSync } from 'fs';
-// import { join } from 'path';
 
-// export const typeDefs = gql(readFileSync(join(__dirname, 'schema.gql'), 'utf8')); 
-export const typeDefs = gql`
-  type Query {
-    users: [User]
-    companies: [Company]
-    findUserById(id: ID!): User
-    findCompanyById(id: ID!): Company
-  }
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-  type Mutation {
-    createUser(user: UserInput): User
-    updateUser(user: UserInput): SuccessResponse
-  }
-
-  type SuccessResponse {
-    success: Boolean!
-    message: String
-    error: String
-  }
-
-  type User{
-    id: ID!
-    firstName: String
-    lastName: String
-    email: String
-    age: Int
-    companyCode:String
-    company: Company
-  }
-
-  type Company{
-    code: ID!
-    name: String
-  }
-  
-  input UserInput {
-    userId: ID!
-    firstName: String
-    lastName: String
-    email: String
-    age: Int
-    companyCode:String
-  }
-`;
+export const typeDefs = gql(readFileSync(join(__dirname, 'schema.gql'), 'utf8'));
 
 type UserInput = {
   userId: string
