@@ -6,7 +6,8 @@ import {
   EntityModelAppUser,
   EntityModelCompany
 } from './generated'
-import { AxiosResponse, RawAxiosRequestConfig } from 'axios';
+import axios, { AxiosResponse, RawAxiosRequestConfig } from 'axios';
+import DataLoader from 'dataloader';
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -21,6 +22,20 @@ type UserInput = {
   age?: number
   companyCode?: string
 }
+
+
+const dataLoader = new DataLoader(async (ids): Promise<EntityModelCompany[]> => {
+  console.log('batch start')
+  console.log(ids)
+
+  const idsStr = ids.join(',')
+  const data = (await axios.get('http://localhost:8080/companies/search/findAllByIdIn',
+    {
+      params: { ids: idsStr }
+    })).data;
+  return data._embedded?.company
+})
+
 
 export const resolvers = {
   Query: {
@@ -58,8 +73,9 @@ export const resolvers = {
     id: (parent: EntityModelAppUser) => `${parent.userId}`,
     // company: (parent: EntityModelAppUser) => parent._links!.company.href
     company: async (parent: EntityModelAppUser) => {
-      const api = new CompanyEntityControllerApi()
-      const data = (await api.getItemResourceCompanyGet(parent.companyCode!)).data
+      const data = (await dataLoader.load(parent.companyCode))
+      // const api = new CompanyEntityControllerApi()
+      // const data = (await api.getItemResourceCompanyGet(parent.companyCode!)).data
 
       console.log(data)
       return data
