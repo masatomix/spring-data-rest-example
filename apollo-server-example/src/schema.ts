@@ -137,10 +137,11 @@ export const resolvers = {
       return (await api.postCollectionResourceAppuserPost(args.user)).data
     },
 
-    updateUser: async (parent: {}, args: { user: UserInput }) => {
-      const findUserResult = await getItemResourceAppuserGet(args.user.userId)
-      if (findUserResult.result) {
-        const instance = findUserResult.result!.data
+    updateUser: async (parent: {}, args: { user: UserInput }): Promise<Response> => {
+      try {
+        const userPromise = new AppUserEntityControllerApi()
+          .getItemResourceAppuserGet(args.user.userId)
+        const instance = (await userPromise).data
         console.log(instance)
 
         const body: AppUserRequestBody = {
@@ -151,9 +152,36 @@ export const resolvers = {
           companyCode: args.user.companyCode ?? instance.companyCode!,
           email: args.user.email ?? instance.email!,
         }
-        return await postCollectionResourceAppuserPost(body)
+
+        try {
+          const updatePromise = new AppUserEntityControllerApi()
+            .postCollectionResourceAppuserPost(body)
+          const result = await updatePromise
+          return { result }
+          // ここでは結果を返すだけ、次のリゾルバにまかせる
+          // return {
+          //   success: true
+          // }
+        } catch (error) {
+          console.log(error)
+          return { error }
+          // ここでは結果を返すだけ、次のリゾルバにまかせる
+          // return {
+          //   success: false,
+          //   error: JSON.stringify(error),
+          //   message: (error as { message: string }).message
+          // }
+        }
+      } catch (error) {
+        console.log(error)
+        return { error }
+        // ここでは結果を返すだけ、次のリゾルバにまかせる
+        // return {
+        //   success: false,
+        //   error: JSON.stringify(error),
+        //   message: (error as { message: string }).message
+        // }
       }
-      return findUserResult;
     }
   }
 }
@@ -164,24 +192,24 @@ type Response = {
 }
 
 
-// try/catch True/Falseに変換する
-const getItemResourceAppuserGet =
-  (id: string, options?: RawAxiosRequestConfig): Promise<Response> => {
-    return new Promise((resolve, reject) => {
-      new AppUserEntityControllerApi()
-        .getItemResourceAppuserGet(id, options)
-        .then(result => resolve({ result }))
-        .catch(error => resolve({ error }))
-    })
-  }
+// // try/catch True/Falseに変換する
+// const getItemResourceAppuserGet =
+//   (id: string, options?: RawAxiosRequestConfig): Promise<Response> => {
+//     return new Promise((resolve, reject) => {
+//       new AppUserEntityControllerApi()
+//         .getItemResourceAppuserGet(id, options)
+//         .then(result => resolve({ result }))
+//         .catch(error => resolve({ error }))
+//     })
+//   }
 
-// try/catch True/Falseに変換する
-const postCollectionResourceAppuserPost =
-  (body: AppUserRequestBody, options?: RawAxiosRequestConfig): Promise<Response> => {
-    return new Promise((resolve, reject) => {
-      new AppUserEntityControllerApi()
-        .postCollectionResourceAppuserPost(body, options)
-        .then(result => resolve({ result }))
-        .catch(error => resolve({ error }))
-    })
-  }
+// // try/catch True/Falseに変換する
+// const postCollectionResourceAppuserPost =
+//   (body: AppUserRequestBody, options?: RawAxiosRequestConfig): Promise<Response> => {
+//     return new Promise((resolve, reject) => {
+//       new AppUserEntityControllerApi()
+//         .postCollectionResourceAppuserPost(body, options)
+//         .then(result => resolve({ result }))
+//         .catch(error => resolve({ error }))
+//     })
+//   }
