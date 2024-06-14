@@ -10,11 +10,9 @@
     updateUser(user: UserInput): SuccessResponse
   }
 
-  type SuccessResponse {
-    success: Boolean!
-    message: String
-    error: String
-  }
+type Response1 {
+  success: Boolean!
+}
 
   type User{
     id: ID!
@@ -25,6 +23,13 @@
     companyCode:String
     company: Company
   }
+type Response2 {
+  success: Boolean!
+  message: String
+  error: String
+}
+
+union SuccessResponse = Response1 | Response2
 
   type Company{
     code: ID!

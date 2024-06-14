@@ -88,6 +88,20 @@ export const resolvers = {
   },
 
   SuccessResponse: {
+    __resolveType(obj: { result: any; }, context: any, info: any) {
+      return obj.result ? 'Response1' : 'Response2'
+    }
+  },
+
+  Response1: {
+    success: (parent: Response) => {
+      return parent.result ?
+        parent.result.status >= 200 && parent.result.status < 300 :
+        false
+    },
+  },
+
+  Response2: {
     success: (parent: Response) => {
       return parent.result ?
         parent.result.status >= 200 && parent.result.status < 300 :
