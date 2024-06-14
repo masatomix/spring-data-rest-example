@@ -6,7 +6,7 @@ import {
   EntityModelAppUser,
   EntityModelCompany
 } from './generated'
-import axios, { AxiosResponse, RawAxiosRequestConfig } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import DataLoader from 'dataloader';
 
 import { readFileSync } from 'fs';
@@ -24,7 +24,18 @@ type UserInput = {
 }
 
 
-const dataLoader = new DataLoader(async (ids): Promise<EntityModelCompany[]> => {
+type RestResponse = {
+  result?: AxiosResponse<EntityModelAppUser, any>;
+  error?: any;
+}
+
+const checkSuccess = (parent: RestResponse): boolean => {
+  return parent.result ?
+    parent.result.status >= 200 && parent.result.status < 300 :
+    false
+}
+
+const dataLoader = new DataLoader<string, EntityModelCompany>(async (ids): Promise<EntityModelCompany[]> => {
   console.log('batch start')
   console.log(ids)
 
@@ -33,7 +44,32 @@ const dataLoader = new DataLoader(async (ids): Promise<EntityModelCompany[]> => 
     {
       params: { ids: idsStr }
     })).data;
-  return data._embedded?.company
+  const companies: EntityModelCompany[] = data._embedded?.company
+  // 戻り値のデータは、引数のデータの順番通りとはかぎらない
+
+  // 引数のidsの順番にあうように、結果を並べ替える処理
+  // companyCodeとCompanyのMap
+  type CompanyMap = { [key: string]: EntityModelCompany }
+  const companyMap: CompanyMap = companies.reduce((map, company) => {
+    map[company.companyCode!] = company
+    return map
+  }, {} as CompanyMap)
+
+  // reduceより、下記の方がわかりやすいっ。。
+  // const companyMap: CompanyMap = {}
+  // for (const company of companies) {
+  //   companyMap[company.companyCode!] = company
+  // }
+
+  return ids.map(id => companyMap[id])
+
+  // const result = ids.map(id => companyMap[id])
+  // console.log('--初期--')
+  // console.log(companies)
+  // console.log('--結果--')
+  // console.log(result)
+  // // 並べ替え処理完了
+  // return result
 })
 
 
@@ -73,7 +109,11 @@ export const resolvers = {
     id: (parent: EntityModelAppUser) => `${parent.userId}`,
     // company: (parent: EntityModelAppUser) => parent._links!.company.href
     company: async (parent: EntityModelAppUser) => {
-      const data = (await dataLoader.load(parent.companyCode))
+      // DataLoaderを使う方法。ここではこのコードの登録(？)のみが行われ、
+      // 実際は全部のcompanyがそろった時点で、DataLoader.BatchLoadFn 関数がコールされる
+      const data = (await dataLoader.load(parent.companyCode!))
+
+      // この方式だと、PK指定でN+1問題が発生しちゃう
       // const api = new CompanyEntityControllerApi()
       // const data = (await api.getItemResourceCompanyGet(parent.companyCode!)).data
 
@@ -87,32 +127,24 @@ export const resolvers = {
     name: (parent: EntityModelCompany) => `${parent.companyName}`,
   },
 
-  SuccessResponse: {
+  Response: {// GraphQLでのunion型は、どちらの型を返すかのロジックを定義しないといけない
     __resolveType(obj: { result: any; }, context: any, info: any) {
-      return obj.result ? 'Response1' : 'Response2'
+      return obj.result ? 'SuccessResponse' : 'FailResponse'
     }
   },
 
-  Response1: {
-    success: (parent: Response) => {
-      return parent.result ?
-        parent.result.status >= 200 && parent.result.status < 300 :
-        false
-    },
+  SuccessResponse: {
+    success: checkSuccess,
   },
 
-  Response2: {
-    success: (parent: Response) => {
-      return parent.result ?
-        parent.result.status >= 200 && parent.result.status < 300 :
-        false
-    },
-    message: (parent: Response) => {
+  FailResponse: {
+    success: checkSuccess,
+    message: (parent: RestResponse) => {
       return parent.result ?
         parent.result.status :
         parent.error.message
     },
-    error: (parent: Response) => {
+    error: (parent: RestResponse) => {
       return parent.result ?
         parent.result.status :
         JSON.stringify(parent.error)
@@ -125,7 +157,7 @@ export const resolvers = {
       return (await api.postCollectionResourceAppuserPost(args.user)).data
     },
 
-    updateUser: async (parent: {}, args: { user: UserInput }): Promise<Response> => {
+    updateUser: async (parent: {}, args: { user: UserInput }): Promise<RestResponse> => {
       try {
         const userPromise = new AppUserEntityControllerApi()
           .getItemResourceAppuserGet(args.user.userId)
@@ -146,58 +178,16 @@ export const resolvers = {
             .postCollectionResourceAppuserPost(body)
           const result = await updatePromise
           return { result }
-          // ここでは結果を返すだけ、次のリゾルバにまかせる
-          // return {
-          //   success: true
-          // }
         } catch (error) {
           console.log(error)
-          return { error }
-          // ここでは結果を返すだけ、次のリゾルバにまかせる
-          // return {
-          //   success: false,
-          //   error: JSON.stringify(error),
-          //   message: (error as { message: string }).message
-          // }
+          return { error } // 例外のときもがんばって正常終了させる
         }
       } catch (error) {
         console.log(error)
-        return { error }
-        // ここでは結果を返すだけ、次のリゾルバにまかせる
-        // return {
-        //   success: false,
-        //   error: JSON.stringify(error),
-        //   message: (error as { message: string }).message
-        // }
+        return { error } // 例外のときもがんばって正常終了させる
       }
     }
   }
 }
 
-type Response = {
-  result?: AxiosResponse<EntityModelAppUser, any>;
-  error?: any;
-}
 
-
-// // try/catch True/Falseに変換する
-// const getItemResourceAppuserGet =
-//   (id: string, options?: RawAxiosRequestConfig): Promise<Response> => {
-//     return new Promise((resolve, reject) => {
-//       new AppUserEntityControllerApi()
-//         .getItemResourceAppuserGet(id, options)
-//         .then(result => resolve({ result }))
-//         .catch(error => resolve({ error }))
-//     })
-//   }
-
-// // try/catch True/Falseに変換する
-// const postCollectionResourceAppuserPost =
-//   (body: AppUserRequestBody, options?: RawAxiosRequestConfig): Promise<Response> => {
-//     return new Promise((resolve, reject) => {
-//       new AppUserEntityControllerApi()
-//         .postCollectionResourceAppuserPost(body, options)
-//         .then(result => resolve({ result }))
-//         .catch(error => resolve({ error }))
-//     })
-//   }
