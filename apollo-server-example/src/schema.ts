@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+import { ApolloError, gql } from 'apollo-server-express';
 import {
   AppUserEntityControllerApi,
   AppUserRequestBody,
@@ -11,6 +11,7 @@ import DataLoader from 'dataloader';
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { CustomError } from './error';
 
 export const typeDefs = gql(readFileSync(join(__dirname, 'schema.gql'), 'utf8'));
 
@@ -180,11 +181,24 @@ export const resolvers = {
           return { result }
         } catch (error) {
           console.log(error)
-          return { error } // 例外のときもがんばって正常終了させる
+          const errorObj = error as Error
+          throw new CustomError(
+            {
+              message: (error as Error).message,
+              code: 'code001',
+              // ext: error
+              extensions: { param1: 'value1', param2: 'value3' }
+            })
+          // return { error } // 例外のときもがんばって正常終了させる// のをやめた
         }
       } catch (error) {
         console.log(error)
-        return { error } // 例外のときもがんばって正常終了させる
+        if (error instanceof CustomError) {
+          throw error
+        }
+        const errorObj = error as Error
+        throw new ApolloError(errorObj.message, 'code002', { param1: 'value1', param2: 'value3' })
+        // return { error } // 例外のときもがんばって正常終了させる// のをやめた
       }
     }
   }
