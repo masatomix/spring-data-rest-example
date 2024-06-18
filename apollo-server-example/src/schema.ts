@@ -24,15 +24,9 @@ type UserInput = {
   companyCode?: string
 }
 
-
-type RestResponse = {
-  result?: AxiosResponse<EntityModelAppUser, any>;
-  error?: any;
-}
-
-const checkSuccess = (parent: RestResponse): boolean => {
-  return parent.result ?
-    parent.result.status >= 200 && parent.result.status < 300 :
+const checkSuccess = (parent: AxiosResponse<EntityModelAppUser, any>): boolean => {
+  return parent ?
+    parent.status >= 200 && parent.status < 300 :
     false
 }
 
@@ -128,29 +122,10 @@ export const resolvers = {
     name: (parent: EntityModelCompany) => `${parent.companyName}`,
   },
 
-  Response: {// GraphQLでのunion型は、どちらの型を返すかのロジックを定義しないといけない
-    __resolveType(obj: { result: any; }, context: any, info: any) {
-      return obj.result ? 'SuccessResponse' : 'FailResponse'
-    }
-  },
-
-  SuccessResponse: {
+  Response: {
     success: checkSuccess,
   },
 
-  FailResponse: {
-    success: checkSuccess,
-    message: (parent: RestResponse) => {
-      return parent.result ?
-        parent.result.status :
-        parent.error.message
-    },
-    error: (parent: RestResponse) => {
-      return parent.result ?
-        parent.result.status :
-        JSON.stringify(parent.error)
-    },
-  },
 
   Mutation: {
     createUser: async (parent: {}, args: { user: UserInput }) => {
@@ -158,7 +133,7 @@ export const resolvers = {
       return (await api.postCollectionResourceAppuserPost(args.user)).data
     },
 
-    updateUser: async (parent: {}, args: { user: UserInput }): Promise<RestResponse> => {
+    updateUser: async (parent: {}, args: { user: UserInput }): Promise<AxiosResponse<EntityModelAppUser, any>> => {
       try {
         const userPromise = new AppUserEntityControllerApi()
           .getItemResourceAppuserGet(args.user.userId)
@@ -178,7 +153,7 @@ export const resolvers = {
           const updatePromise = new AppUserEntityControllerApi()
             .postCollectionResourceAppuserPost(body)
           const result = await updatePromise
-          return { result }
+          return result
         } catch (error) {
           console.log(error)
           const errorObj = error as Error

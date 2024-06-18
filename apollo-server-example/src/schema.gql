@@ -10,17 +10,9 @@ type Mutation {
   updateUser(user: UserInput): Response
 }
 
-type SuccessResponse {
+type Response {
   success: Boolean!
 }
-
-type FailResponse {
-  success: Boolean!
-  message: String
-  error: String
-}
-
-union Response = SuccessResponse | FailResponse
 
 type User {
   id: ID!
