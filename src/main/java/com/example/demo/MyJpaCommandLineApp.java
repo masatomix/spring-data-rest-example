@@ -1,12 +1,10 @@
 package com.example.demo;
 
-import java.security.Timestamp;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -46,7 +44,7 @@ public class MyJpaCommandLineApp implements CommandLineRunner {
         instance.setCreatedTimestamp(time);
         instance.setCreatedTstz(time);
         instance.setCreatedTslocaltz(time);
-        // repository.save(instance);
+        repository.save(instance);
         // }
 
         // ここでRepositoryを使った処理を実行する
