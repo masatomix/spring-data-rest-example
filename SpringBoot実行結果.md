@@ -63,3 +63,122 @@ $ ./gradlew clean bootRun
 > :bootRun
 
 ```
+
+
+curlでRESTをとってみた
+
+
+JST
+
+```
+$ curl -X 'GET' \
+  'http://localhost:8080/dateEntities?page=0&size=20' \
+  -H 'accept: application/hal+json'
+{
+  "_embedded" : {
+    "dateEntity" : [ {
+      "createAt" : "2024-07-05T14:53:39.54234Z",
+      "updateAt" : "2024-07-05T14:53:39.542437Z",
+      "createdDate" : "2024-01-01T00:00:00.000+00:00",
+      "createdTimestamp" : "2024-01-01T09:00:00Z",
+      "createdTstz" : "2024-01-01T09:00:00+09:00",
+      "createdTslocaltz" : "2024-01-01T00:00:00Z",
+      }
+    }, {
+      "createAt" : "2024-07-05T15:20:24.634837Z",
+      "updateAt" : "2024-07-05T15:20:24.634857Z",
+      "createdDate" : "2023-12-31T22:00:00.000+00:00",
+      "createdTimestamp" : "2024-01-01T07:00:00Z",
+      "createdTstz" : "2024-01-01T07:00:00+07:00",
+      "createdTslocaltz" : "2024-01-01T00:00:00Z",
+      }
+    } ]
+  },
+  "page" : {
+    "size" : 20,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "number" : 0
+  }
+}
+$
+```
+
+
+UTC
+
+```
+$ curl -X 'GET' \
+  'http://localhost:8080/dateEntities?page=0&size=20' \
+  -H 'accept: application/hal+json'
+
+{
+  "_embedded" : {
+    "dateEntity" : [ {
+      "createAt" : "2024-07-05T14:53:39.54234Z",
+      "updateAt" : "2024-07-05T14:53:39.542437Z",
+      "createdDate" : "2024-01-01T09:00:00.000+00:00",
+      "createdTimestamp" : "2024-01-01T09:00:00Z",
+      "createdTstz" : "2024-01-01T09:00:00+09:00",
+      "createdTslocaltz" : "2024-01-01T00:00:00Z",
+      }
+    }, {
+      "createAt" : "2024-07-05T15:20:24.634837Z",
+      "updateAt" : "2024-07-05T15:20:24.634857Z",
+      "createdDate" : "2024-01-01T07:00:00.000+00:00",
+      "createdTimestamp" : "2024-01-01T07:00:00Z",
+      "createdTstz" : "2024-01-01T07:00:00+07:00",
+      "createdTslocaltz" : "2024-01-01T00:00:00Z",
+      }
+    } ]
+  },
+  "page" : {
+    "size" : 20,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "number" : 0
+  }
+}
+$
+```
+
+
+
+Jakarta
+
+```
+$ curl -X 'GET' \
+  'http://localhost:8080/dateEntities?page=0&size=20' \
+  -H 'accept: application/hal+json'
+
+{
+  "_embedded" : {
+    "dateEntity" : [ {
+      "createAt" : "2024-07-05T14:53:39.54234Z",
+      "updateAt" : "2024-07-05T14:53:39.542437Z",
+      "createdDate" : "2024-01-01T02:00:00.000+00:00",
+      "createdTimestamp" : "2024-01-01T09:00:00Z",
+      "createdTstz" : "2024-01-01T09:00:00+09:00",
+      "createdTslocaltz" : "2024-01-01T00:00:00Z",
+      }
+    }, {
+      "createAt" : "2024-07-05T15:20:24.634837Z",
+      "updateAt" : "2024-07-05T15:20:24.634857Z",
+      "createdDate" : "2024-01-01T00:00:00.000+00:00",
+      "createdTimestamp" : "2024-01-01T07:00:00Z",
+      "createdTstz" : "2024-01-01T07:00:00+07:00",
+      "createdTslocaltz" : "2024-01-01T00:00:00Z",
+      }
+    } ]
+  },
+  "page" : {
+    "size" : 20,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "number" : 0
+  }
+}
+$
+```
+
+createdDate 以外は同じデータとなる
