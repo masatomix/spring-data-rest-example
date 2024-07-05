@@ -3,7 +3,6 @@ package com.example.demo.entity;
 import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -12,8 +11,6 @@ import lombok.Data;
 @MappedSuperclass
 @Data
 public abstract class Auditable {
-    @Id
-    private String id;
     
     // レコード単位で、Timezoneを持つ事ができるデータ型
     // TIMESTAMP WITH TIME ZONE型:
