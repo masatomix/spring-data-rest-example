@@ -1,3 +1,69 @@
+## Oracle インストール(Docker上)
+
+```
+# docker run -d -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=admin --name oracle-express-21 container-registry.oracle.com/database/express:21.3.0-xe
+19bcb8a6bf53e66ebb3617d0250949de2a88cbd2a166a7fd97181b5c8b3eace6
+
+# docker exec -it  oracle-express-21 /bin/bash
+
+bash-4.2$ sqlplus / as sysdba
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Mon Jul 8 01:41:43 2024
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> alter session set container = XEPDB1;
+
+Session altered.
+
+SQL> quit
+Disconnected from Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+
+bash-4.2$ exit
+exit
+# 
+```## Oracle インストール(Docker上)
+
+```
+# docker run -d -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=admin --name oracle-express-21 container-registry.oracle.com/database/express:21.3.0-xe
+19bcb8a6bf53e66ebb3617d0250949de2a88cbd2a166a7fd97181b5c8b3eace6
+
+# docker exec -it  oracle-express-21 /bin/bash
+
+bash-4.2$ sqlplus / as sysdba
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Mon Jul 8 01:41:43 2024
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> alter session set container = XEPDB1;
+
+Session altered.
+
+SQL> quit
+Disconnected from Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+
+bash-4.2$ exit
+exit
+# 
+```
+
+
+
 ## Oracle sysdba でPluggale Databaseに接続する手順
 
 Docker上にOracleが起動している前提で。。
@@ -130,5 +196,6 @@ spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
 spring.datasource.username=FOO
 spring.datasource.password=BAR
 ```
+
 
 
